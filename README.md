@@ -25,11 +25,11 @@ First, run the development server:
 # with each other, by using their container name as a hostname
 docker network create next_network
 
-# Build dev
-docker compose -f docker-compose.dev.yml build
+# Up dev in detached mode. To stop, see the "Useful commands" section
+docker compose -f docker-compose.dev.yml up -d --build
 
-# Up dev
-docker compose -f docker-compose.dev.yml up
+# See logs
+docker logs -f $(docker ps -aq)
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.

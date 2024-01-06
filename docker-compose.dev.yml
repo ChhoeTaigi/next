@@ -16,8 +16,9 @@ services:
     env_file:
       - .env
     volumes:
-      - ./nextjs/src:/app/src
-      - ./nextjs/public:/app/public
+      - ./nextjs:/app
+      - /app/node_modules
+      - /app/.next
     restart: always
     ports:
       - 3000:3000
