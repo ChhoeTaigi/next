@@ -5,19 +5,15 @@ FROM base AS builder
 
 WORKDIR /app
 
-# Install dependencies based on the preferred package manager
-COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
-# Omit --production flag for TypeScript devDependencies
-RUN \
-  if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
-  elif [ -f package-lock.json ]; then npm ci; \
-  elif [ -f pnpm-lock.yaml ]; then yarn global add pnpm && pnpm i; \
-  # Allow install without lockfile, so example works even without Node.js installed locally
-  else echo "Warning: Lockfile not found. It is recommended to commit lockfiles to version control." && yarn install; \
-  fi
+COPY package.json pnpm-lock.yaml* ./
+RUN yarn global add pnpm && pnpm i
 
 COPY app ./app
+COPY dictionaries ./dictionaries
 COPY public ./public
+COPY get-dictionary.ts .
+COPY i18n-config.ts .
+COPY middleware.ts .
 COPY next.config.js .
 COPY tsconfig.json .
 
@@ -32,13 +28,8 @@ ENV NEXT_PUBLIC_ENV_VARIABLE=${NEXT_PUBLIC_ENV_VARIABLE}
 # Uncomment the following line to disable telemetry at build time
 # ENV NEXT_TELEMETRY_DISABLED 1
 
-# Build Next.js based on the preferred package manager
-RUN \
-  if [ -f yarn.lock ]; then yarn build; \
-  elif [ -f package-lock.json ]; then npm run build; \
-  elif [ -f pnpm-lock.yaml ]; then pnpm build; \
-  else yarn build; \
-  fi
+# Build Next.js
+RUN pnpm build
 
 # Note: It is not necessary to add an intermediate step that does a full copy of `node_modules` here
 
